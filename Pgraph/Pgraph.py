@@ -7,7 +7,7 @@ from networkx.drawing.nx_pydot import pydot_layout
 from lxml import etree
 import networkx as nx
 import platform
-import pandas as pd
+
 
 class Pgraph():
     def __init__(self, problem_network, mutual_exclusion=[[]], solver="INSIDEOUT",max_sol=100, input_file=None):
