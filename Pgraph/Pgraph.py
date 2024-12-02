@@ -255,6 +255,15 @@ class Pgraph():
                 self.wine_installed=True
             out_string=" ".join(["wine",path+solver_name,solver, path+"input.in", path+"test_out.out", str(max_sol)])
             os.popen(out_string).read()
+        elif system == "ARM":
+            # use the ARM-compiled pns solver
+            subprocess.run([
+                path + solver_name,
+                solver,
+                path + "input.in",
+                path + "test_out.out",
+            ])
+
         ################
     
     def read_solutions(self):
