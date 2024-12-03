@@ -7,6 +7,7 @@ from networkx.drawing.nx_pydot import pydot_layout
 from lxml import etree
 import networkx as nx
 import platform
+import tempfile
 
 
 class Pgraph():
@@ -112,7 +113,7 @@ class Pgraph():
         ax.set_title("Original Problem ",y=titlepos)
         return ax
     
-    def create_solver_input(self):
+    def create_solver_input(self, input_file):
         '''
         create_solver_input()
         
@@ -123,7 +124,6 @@ class Pgraph():
 
         G=self.G
         ME=self.ME
-        path=self.path
         ### MAKE INPUT FILE #############
         prelines=[
         'file_type=PNS_problem_v1','\n',
@@ -213,11 +213,11 @@ class Pgraph():
                 
         prelines.append("\n")        
                 
-        with open(path+'input.in', 'w') as f:
+        with open(input_file, 'w') as f:
             for line in prelines:
                 f.write(line)
 
-    def solve(self,system=None,skip_wine=False, solver_name='pgraph_solver.exe',path=None):
+    def solve(self,system=None,skip_wine=False, solver_name='pgraph_solver.exe', input_file: str = "", output_file: str = ""):
         '''
         solve(system=None,skip_wine=False)
         
@@ -230,8 +230,7 @@ class Pgraph():
         solver_name= (string) For advanced users only. Choose your customized solver. 'pgraph_solver.exe' or 'pgraph_solver_new.exe'
         path = (string) path to the custom solver. If None, then the default library installation path will be used.
         '''
-        if path==None:
-            path=self.path
+        path=self.path
         max_sol=self.max_sol
         solver=self.solver
         solver_dict={0:"MSG",1:"SSG",2:"SSGLP",3:"INSIDEOUT"}
@@ -260,13 +259,13 @@ class Pgraph():
             subprocess.run([
                 path + solver_name,
                 solver,
-                path + "input.in",
-                path + "test_out.out",
+                input_file,
+                output_file,
             ])
 
         ################
     
-    def read_solutions(self):
+    def read_solutions(self, output_file):
         '''
         read_solutions()
         
@@ -280,7 +279,7 @@ class Pgraph():
         goolist=[]
         
         #clean strings
-        with open(path+"test_out.out","r") as f:
+        with open(output_file, 'r') as f:
             lines = f.readlines()
         for i in range(len(lines)-1,1,-1):
             if lines[i-1].strip() == "Operating units(1):":
@@ -933,7 +932,7 @@ class Pgraph():
             print("Generated P-graph Studio File at ", path)
         return header+xml    
         
-    def run(self,system=None,skip_wine=False, solver_name='pgraph_solver.exe',path=None):
+    def run(self, system=None, skip_wine=False, solver_name='pgraph_solver.exe',path=None, input_file: str | None = None, output_file: str | None = None):
         '''
         run(system=None,skip_wine=False)
         
@@ -946,9 +945,23 @@ class Pgraph():
         solver_name= (string) For advanced users only. Choose your customized solver. 'pgraph_solver.exe' or 'pgraph_solver_new.exe'
         path = (string) path to the custom solver. If None, then the default library installation path will be used.
         '''
-        self.create_solver_input()
-        self.solve(system=system,skip_wine=skip_wine,solver_name=solver_name,path=path)
-        self.read_solutions()
+        if input_file is None:
+            # set input file to a temp file
+            input_file = tempfile.NamedTemporaryFile(delete=False).name
+        if output_file is None:
+            # set output file to a temp file
+            output_file = tempfile.NamedTemporaryFile(delete=False).name
+        self.create_solver_input(input_file=input_file)
+        self.solve(
+            system=system,
+            skip_wine=skip_wine,
+            solver_name=solver_name,
+            input_file=input_file,
+            output_file=output_file,
+        )
+        self.read_solutions(output_file=output_file)
+
+        # 
         
     def get_info(self):
         '''
