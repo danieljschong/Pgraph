@@ -247,10 +247,10 @@ class Pgraph():
             # detect architecture, ARM or x86
             if platform.machine() in ["arm64", "aarch64"]:
                 # use the ARM-compiled pns solver
-                solver = "pns_solver_2018_ARM"
+                solver_name = "pns_solver_2018_ARM"
             elif platform.machine() in ["x86_64"]:
                 # use the x86-compiled pns solver
-                solver = "pns_solver_2018_x86"
+                solver_name = "pns_solver_2018_x86"
             else:
                 # unknown architecture, raise an error
                 raise Exception("Could not run solver, unknown architecture: " + platform.machine())
