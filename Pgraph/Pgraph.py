@@ -261,6 +261,7 @@ class Pgraph():
                 solver,
                 input_file,
                 output_file,
+                str(max_sol)
             ])
 
         ################
