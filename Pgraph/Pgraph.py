@@ -244,18 +244,17 @@ class Pgraph():
             else:
                 rc=subprocess.run([path+solver_name,solver, path+"input.in", path+"test_out.out", str(max_sol)])                
         elif system=="Linux":
-            #try installing dependencies
-            if skip_wine==False and self.wine_installed==False:
-                print("Installing wine dependencies (only for Linux), this may take longer for the first time. Use skip_wine=True if you are sure wine is installed.")
-                os.system("apt-get install wine-stable")
-                os.system("dpkg --add-architecture i386")
-                os.system("apt-get update")
-                os.system("apt-get install wine32")
-                self.wine_installed=True
-            out_string=" ".join(["wine",path+solver_name,solver, path+"input.in", path+"test_out.out", str(max_sol)])
-            os.popen(out_string).read()
-        elif system == "ARM":
-            # use the ARM-compiled pns solver
+            # detect architecture, ARM or x86
+            if platform.machine() in ["arm64", "aarch64"]:
+                # use the ARM-compiled pns solver
+                solver = "pns_solver_2018_ARM"
+            elif platform.machine() in ["x86_64"]:
+                # use the x86-compiled pns solver
+                solver = "pns_solver_2018_x86"
+            else:
+                # unknown architecture, raise an error
+                raise Exception("Could not run solver, unknown architecture: " + platform.machine())
+            
             subprocess.run([
                 path + solver_name,
                 solver,
