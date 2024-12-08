@@ -2,3 +2,5 @@ include Pgraph/solver/*.dll
 include Pgraph/solver/*.exe
 include Pgraph/solver/*.out
 include Pgraph/solver/*.in
+include Pgraph/solver/pns_solver_2018_ARM
+include Pgraph/solver/pns_solver_2018_x86
